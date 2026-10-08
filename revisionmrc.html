@@ -1,0 +1,920 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Révisions 1MRC</title>
+<style>
+
+:root{
+  --fond:#16235C; --fond-2:#22337E; --ligne:#3A4C9C;
+  --jaune:#FFC61A; --rouge:#E4322B; --vert:#1FA35C;
+  --blanc:#FFFFFF; --brume:#C9D2F2;
+  --or:#FFC61A; --argent:#C9D2F2; --bronze:#E39A5B;
+}
+*,*::before,*::after{box-sizing:border-box}
+html,body{min-height:100%;margin:0}
+body{background:var(--fond);color:var(--blanc);font-family:"Bricolage Grotesque",system-ui,"Segoe UI",Roboto,Arial,sans-serif;font-size:17px;line-height:1.45}
+button{font:inherit;cursor:pointer;border:0;border-radius:10px}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--jaune);outline-offset:3px}
+input,select{font:inherit}
+.hidden{display:none!important}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+.btn{padding:13px 22px;font-weight:600;font-size:1.05rem}
+.btn-jaune{background:var(--jaune);color:var(--fond)}
+.btn-neutre{background:var(--fond-2);color:var(--blanc);border:1px solid var(--ligne)}
+.btn-rouge{background:var(--rouge);color:var(--blanc)}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.sous{color:var(--brume);font-size:.95rem;margin:0}
+.champ{padding:12px 14px;border-radius:10px;border:2px solid var(--ligne);background:var(--fond-2);color:var(--blanc);font-size:1.1rem;width:100%}
+
+/* ----- Accueil ----- */
+#accueil{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px}
+.accueil-grille{display:grid;grid-template-columns:1fr 1fr;gap:28px;max-width:860px;width:100%}
+@media (max-width:760px){.accueil-grille{grid-template-columns:1fr}}
+.accueil-titre{grid-column:1/-1;margin:0 0 4px}
+.accueil-titre h1{margin:0;font-size:clamp(2rem,5vw,3.2rem);font-weight:800;line-height:1.05}
+.accueil-titre p{margin:6px 0 0;color:var(--brume)}
+.carte{background:var(--fond-2);border:2px solid var(--ligne);border-radius:18px;padding:24px;display:flex;flex-direction:column;gap:12px}
+.carte h2{margin:0;font-size:1.3rem}
+.carte.eleve-carte{border-color:var(--jaune)}
+.code-champ{text-transform:uppercase;letter-spacing:.2em;font-weight:800;text-align:center;font-size:1.6rem}
+.erreur{color:#FF9B94;font-size:.95rem;min-height:1.4em;margin:0}
+
+/* ----- Prof ----- */
+#prof{min-height:100vh;display:flex;flex-direction:column}
+.barre{display:flex;flex-wrap:wrap;gap:12px 28px;align-items:center;justify-content:space-between;padding:18px 32px;border-bottom:2px solid var(--ligne)}
+.barre h1{margin:0;font-size:1.4rem;font-weight:800}
+.code-aff{display:flex;align-items:baseline;gap:12px}
+.code-aff small{color:var(--brume)}
+.code-aff strong{font-size:2.6rem;font-weight:800;letter-spacing:.14em;color:var(--jaune);line-height:1}
+.reseau{font-size:.9rem;color:var(--brume)}
+.reseau.err{color:#FF9B94}
+.vue{padding:26px 32px;flex:1}
+
+.salon{display:grid;grid-template-columns:minmax(0,1fr) minmax(280px,380px);gap:28px}
+@media (max-width:900px){.salon{grid-template-columns:1fr}}
+.reglages{display:flex;flex-direction:column;gap:22px}
+.bloc h2{margin:0 0 10px;font-size:1.1rem;font-weight:600}
+.durees{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.durees label{position:relative}
+.durees input[type=radio]{position:absolute;opacity:0}
+.durees label>span{display:inline-block;padding:9px 16px;border-radius:999px;border:2px solid var(--ligne);font-weight:600;cursor:pointer}
+.durees input:checked+span{background:var(--jaune);color:var(--fond);border-color:var(--jaune)}
+.durees input:focus-visible+span{outline:3px solid var(--jaune);outline-offset:2px}
+.perso{display:flex;align-items:center;gap:6px;color:var(--brume)}
+.perso input{width:76px;padding:8px;border-radius:8px;border:2px solid var(--ligne);background:var(--fond-2);color:var(--blanc);text-align:center}
+.themes{display:flex;flex-direction:column;gap:8px}
+.themes label{display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--fond-2);border-radius:10px;cursor:pointer}
+.themes input{width:20px;height:20px;accent-color:var(--jaune)}
+.themes em{margin-left:auto;font-style:normal;color:var(--brume);font-size:.9rem}
+.interrupteur{display:flex;align-items:center;gap:10px;cursor:pointer}
+.interrupteur input{width:20px;height:20px;accent-color:var(--jaune)}
+.seuil{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.seuil input{width:80px;padding:8px;border-radius:8px;border:2px solid var(--ligne);background:var(--fond-2);color:var(--blanc);text-align:center}
+.aide{color:var(--brume);font-size:.92rem;margin:8px 0 0}
+.aide b{color:var(--jaune)}
+.salle-attente{background:var(--fond-2);border:2px solid var(--ligne);border-radius:18px;padding:22px;display:flex;flex-direction:column;gap:14px}
+.consigne{background:var(--fond);border-radius:12px;padding:14px;font-size:.95rem}
+.consigne strong{color:var(--jaune);letter-spacing:.1em}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chips span{background:var(--fond);padding:5px 12px;border-radius:999px;font-weight:600;display:inline-flex;align-items:center;gap:6px}
+.chips span.off{opacity:.5}
+.chips span::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--vert)}
+.chips span.off::before{background:#6C77A8}
+
+/* jeu prof */
+.direct{display:grid;grid-template-columns:minmax(260px,360px) minmax(0,1fr);gap:28px;align-items:start}
+@media (max-width:900px){.direct{grid-template-columns:1fr}}
+.chrono-carte{background:var(--fond-2);border:2px solid var(--ligne);border-radius:18px;padding:26px;text-align:center;display:flex;flex-direction:column;gap:14px}
+.chrono{font-size:clamp(3.5rem,8vw,6rem);font-weight:800;line-height:1;font-variant-numeric:tabular-nums}
+.chrono.urgent{color:var(--rouge)}
+.jauge{height:10px;background:var(--fond);border-radius:999px;overflow:hidden}
+.jauge i{display:block;height:100%;background:var(--jaune);transition:width 1s linear}
+.tableau{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}
+.tableau th{text-align:left;color:var(--brume);font-weight:600;font-size:.9rem;padding:8px 10px;border-bottom:2px solid var(--ligne)}
+.tableau td{padding:9px 10px;border-bottom:1px solid var(--ligne)}
+.tableau td.num,.tableau th.num{text-align:right}
+.tableau td.num{white-space:nowrap}
+.tableau .rang{color:var(--brume);width:2.5em}
+.pct-barre{display:flex;align-items:center;gap:10px;justify-content:flex-end}
+.pct-barre b{min-width:3.4em;text-align:right}
+.mini{width:90px;height:8px;background:var(--fond);border-radius:999px;overflow:hidden}
+.mini i{display:block;height:100%}
+
+/* podium */
+.final{display:flex;flex-direction:column;gap:30px;align-items:center}
+.final h2{margin:0;font-size:2rem;font-weight:800;text-align:center}
+.podium{display:flex;align-items:flex-end;justify-content:center;gap:14px;width:100%;max-width:820px;min-height:380px}
+.marche{flex:1;display:flex;flex-direction:column;align-items:center;gap:10px;opacity:0;transform:translateY(40px);transition:opacity .6s,transform .6s}
+.marche.vu{opacity:1;transform:none}
+.marche .qui{font-size:clamp(1.3rem,3vw,2.2rem);font-weight:800;text-align:center;word-break:break-word;line-height:1.1}
+.marche .det{color:var(--brume);font-size:1rem;text-align:center}
+.socle{width:100%;border-radius:14px 14px 0 0;display:flex;align-items:flex-start;justify-content:center;padding-top:14px;font-size:3rem;font-weight:800;color:var(--fond)}
+.m1 .socle{height:220px;background:var(--or)}
+.m2 .socle{height:160px;background:var(--argent)}
+.m3 .socle{height:110px;background:var(--bronze)}
+.actions{display:flex;flex-wrap:wrap;gap:12px;justify-content:center}
+.resultats{width:100%;max-width:1100px;overflow-x:auto}
+.confetti{position:fixed;inset:0;pointer-events:none;overflow:hidden}
+.confetti i{position:absolute;top:-20px;width:10px;height:16px;animation:tombe linear forwards}
+@keyframes tombe{to{transform:translateY(110vh) rotate(720deg)}}
+
+/* ----- Élève ----- */
+#eleve{min-height:100vh;display:flex;flex-direction:column}
+.eleve-barre{display:flex;align-items:center;gap:18px;padding:14px 28px;border-bottom:2px solid var(--ligne)}
+.eleve-barre strong{font-size:1.15rem}
+.eleve-barre .score{color:var(--jaune);font-weight:800}
+.eleve-barre .temps{margin-left:auto;font-weight:800;font-size:1.4rem;font-variant-numeric:tabular-nums}
+.eleve-barre .temps.urgent{color:var(--rouge)}
+.son-btn{background:var(--fond-2);color:var(--blanc);border:1px solid var(--ligne);padding:6px 12px;font-size:.9rem}
+.eleve-jauge{height:6px;background:var(--fond-2)}
+.eleve-jauge i{display:block;height:100%;background:var(--jaune);transition:width 1s linear}
+.eleve-zone{flex:1;display:flex;align-items:center;justify-content:center;padding:28px}
+.attente{text-align:center;display:flex;flex-direction:column;gap:10px;align-items:center}
+.attente .gros{font-size:2rem;font-weight:800}
+.question{width:100%;max-width:860px;display:flex;flex-direction:column;gap:20px}
+.etiquette-theme{color:var(--jaune);font-weight:600}
+.question h2{margin:0;font-size:clamp(1.4rem,2.6vw,2rem);line-height:1.25}
+.choix{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media (max-width:700px){.choix{grid-template-columns:1fr}}
+.choix button{background:var(--fond-2);color:var(--blanc);border:2px solid var(--ligne);padding:18px 18px 18px 56px;text-align:left;font-size:1.1rem;position:relative;min-height:72px;transition:border-color .15s,background .15s}
+.choix button:hover:not(:disabled){border-color:var(--jaune)}
+.choix button kbd{position:absolute;left:16px;top:50%;transform:translateY(-50%);width:28px;height:28px;border-radius:7px;background:var(--fond);display:flex;align-items:center;justify-content:center;font-family:inherit;font-weight:800;color:var(--jaune)}
+.choix button:disabled{cursor:default}
+.choix button.juste{background:var(--vert);border-color:var(--vert)}
+.choix button.faux{background:var(--rouge);border-color:var(--rouge)}
+.choix button.terne{opacity:.45}
+.correction{border-radius:14px;padding:16px 18px;display:flex;flex-direction:column;gap:6px}
+.correction.ok{background:rgba(31,163,92,.18);border:2px solid var(--vert)}
+.correction.ko{background:rgba(228,50,43,.16);border:2px solid var(--rouge)}
+.correction b{font-size:1.15rem}
+.suivante{align-self:flex-end}
+.bilan{text-align:center;display:flex;flex-direction:column;gap:12px;align-items:center}
+.bilan .pct{font-size:clamp(4rem,12vw,7rem);font-weight:800;line-height:1;color:var(--jaune)}
+.bilan .rang{font-size:1.5rem;font-weight:800}
+
+body{font-family:"Segoe UI",system-ui,-apple-system,Roboto,"Helvetica Neue",Arial,sans-serif}
+.lien-prof{background:none;color:var(--brume);text-decoration:underline;padding:6px;font-size:.95rem;justify-self:center;grid-column:1/-1}
+.code-partie{font-size:clamp(3rem,9vw,6.5rem);font-weight:800;letter-spacing:.12em;color:var(--jaune);line-height:1;text-align:center;font-variant-numeric:tabular-nums}
+.centre{display:flex;flex-direction:column;align-items:center;gap:18px;text-align:center}
+.resume{color:var(--brume);max-width:720px}
+.actions-g{display:flex;flex-wrap:wrap;gap:12px;justify-content:center}
+.saisie{display:grid;grid-template-columns:2fr 1fr 1fr 1.3fr auto;gap:10px;align-items:end;max-width:980px;width:100%}
+.saisie label{display:flex;flex-direction:column;gap:4px;font-size:.9rem;color:var(--brume)}
+.saisie input{padding:10px 12px;border-radius:10px;border:2px solid var(--ligne);background:var(--fond-2);color:var(--blanc);font-size:1.05rem}
+.saisie input.ctrl{text-transform:uppercase;letter-spacing:.15em;font-weight:800}
+@media (max-width:760px){.saisie{grid-template-columns:1fr 1fr}}
+.ok-txt{color:#6EE7A0;font-weight:700}
+.ko-txt{color:#FF9B94;font-weight:700}
+.btn-x{background:transparent;color:var(--brume);border:1px solid var(--ligne);padding:4px 10px;font-size:.9rem}
+.bloc-code{background:var(--fond-2);border:2px solid var(--jaune);border-radius:16px;padding:16px 22px;display:inline-flex;flex-direction:column;gap:4px;align-items:center}
+.bloc-code b{font-size:2.6rem;letter-spacing:.2em;color:var(--jaune);line-height:1.1}
+.themes-bilan{list-style:none;padding:0;margin:0;display:flex;flex-wrap:wrap;gap:8px;justify-content:center;max-width:760px}
+.themes-bilan li{background:var(--fond-2);border-radius:999px;padding:5px 12px;font-size:.95rem}
+.vue-prof{padding:26px 32px;flex:1}
+.chrono-geant{font-size:clamp(6rem,20vw,14rem);font-weight:800;line-height:1;font-variant-numeric:tabular-nums}
+.chrono-geant.urgent{color:var(--rouge)}
+.jauge-large{width:min(900px,90vw);height:14px;background:var(--fond-2);border-radius:999px;overflow:hidden}
+.jauge-large i{display:block;height:100%;background:var(--jaune);transition:width 1s linear}
+</style>
+</head>
+<body>
+
+<!-- ================= ACCUEIL ================= -->
+<main id="accueil">
+  <div class="accueil-grille" style="grid-template-columns:1fr;max-width:480px">
+    <div class="accueil-titre">
+      <h1>Révisions 1MRC</h1>
+      <p>Étapes de la vente · suivi des ventes · réclamations · retours · CV · lettre de motivation</p>
+    </div>
+    <form class="carte eleve-carte" id="formEleve" autocomplete="off">
+      <h2>Je suis élève</h2>
+      <label class="sous" for="codeSaisi">Code de la partie (donné par le professeur)</label>
+      <input class="champ code-champ" id="codeSaisi" maxlength="9" required placeholder="XXXX-XXXX" style="font-size:1.5rem;letter-spacing:.12em">
+      <label class="sous" for="prenom">Ton prénom</label>
+      <input class="champ" id="prenom" maxlength="16" required placeholder="Prénom">
+      <button class="btn btn-jaune" type="submit">Commencer</button>
+      <p class="erreur" id="erreurEleve"></p>
+    </form>
+    <button class="lien-prof" id="bEspaceProf" type="button">Espace enseignant</button>
+    <form class="carte hidden" id="formProf" autocomplete="off">
+      <h2>Espace enseignant</h2>
+      <label class="sous" for="codeProf">Code enseignant</label>
+      <input class="champ" id="codeProf" type="password" required>
+      <button class="btn btn-neutre" type="submit">Entrer</button>
+      <p class="erreur" id="erreurProf"></p>
+    </form>
+  </div>
+</main>
+
+<!-- ================= PROF ================= -->
+<main id="prof" class="hidden">
+  <header class="barre">
+    <h1>Révisions 1MRC · enseignant</h1>
+    <div class="code-aff"><small>Code de la partie</small><strong id="codeAff" style="font-size:2rem">—</strong></div>
+    <button class="btn-x" id="bQuitter" type="button">Fermer l'espace enseignant</button>
+  </header>
+
+  <!-- Réglages -->
+  <section class="vue-prof" id="vueReglages">
+    <div class="reglages" style="max-width:900px;margin:0 auto">
+      <div class="bloc">
+        <h2>Durée de la partie</h2>
+        <div class="durees" id="durees">
+          <label><input type="radio" name="duree" value="3"><span>3 min</span></label>
+          <label><input type="radio" name="duree" value="5"><span>5 min</span></label>
+          <label><input type="radio" name="duree" value="10" checked><span>10 min</span></label>
+          <label><input type="radio" name="duree" value="15"><span>15 min</span></label>
+          <label><input type="radio" name="duree" value="20"><span>20 min</span></label>
+          <label><input type="radio" name="duree" value="perso"><span>Autre</span></label>
+          <span class="perso"><input type="number" id="dureePerso" min="1" max="120" value="8" aria-label="Durée personnalisée en minutes"> min</span>
+        </div>
+      </div>
+      <div class="bloc">
+        <h2>Thèmes</h2>
+        <div class="themes" id="themes"></div>
+      </div>
+      <div class="bloc">
+        <h2>Nombre minimum de réponses attendues</h2>
+        <div class="seuil"><input type="number" id="seuil" min="1" max="300" value="10" aria-label="Nombre minimum de réponses attendues"> réponses</div>
+        <p class="aide" id="seuilAide"></p>
+      </div>
+      <div class="bloc">
+        <h2>Son</h2>
+        <label class="interrupteur"><input type="checkbox" id="sonProf" checked> Activer le son (sur votre écran et sur les PC des élèves)</label>
+      </div>
+      <div><button class="btn btn-jaune" id="bCreer" type="button">Créer la partie</button> <span class="erreur" id="erreurCreer"></span></div>
+    </div>
+  </section>
+
+  <!-- Code de la partie -->
+  <section class="vue-prof hidden" id="vueCode">
+    <div class="centre">
+      <p class="sous">Les élèves ouvrent ce fichier, tapent ce code et leur prénom, puis cliquent sur « Commencer ».</p>
+      <div class="code-partie" id="codeGeant"></div>
+      <p class="resume" id="resume"></p>
+      <div class="actions-g">
+        <button class="btn btn-jaune" id="bChrono" type="button">Lancer le chrono au tableau</button>
+        <button class="btn btn-neutre" id="bVersSaisie" type="button">Saisir les résultats</button>
+        <button class="btn btn-neutre" id="bNouvelle" type="button">Nouvelle partie</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Chrono au tableau -->
+  <section class="vue-prof hidden" id="vueChrono">
+    <div class="centre">
+      <div class="sous">Temps restant · code <b id="codeRappel" style="color:var(--jaune)"></b></div>
+      <div class="chrono-geant" id="chronoGeant">10:00</div>
+      <div class="jauge-large"><i id="jaugeGeante" style="width:100%"></i></div>
+      <p class="sous">Chaque élève a la même durée à partir du moment où il clique sur « Commencer ».</p>
+      <div class="actions-g">
+        <button class="btn btn-neutre" id="bArretChrono" type="button">Arrêter le chrono</button>
+        <button class="btn btn-jaune" id="bChronoSaisie" type="button">Saisir les résultats</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Saisie des résultats -->
+  <section class="vue-prof hidden" id="vueSaisie">
+    <div class="centre" style="align-items:stretch;max-width:1000px;margin:0 auto;text-align:left">
+      <p class="sous">À la fin, chaque élève voit son résultat et un code de contrôle. Recopiez-les ici, ou laissez les élèves venir les saisir. Un code incorrect signale une erreur de saisie ou un score modifié.</p>
+      <form class="saisie" id="formSaisie" autocomplete="off">
+        <label>Prénom<input id="sPrenom" maxlength="16" required></label>
+        <label>Bonnes réponses<input id="sOk" type="number" min="0" max="999" required></label>
+        <label>Réponses<input id="sRep" type="number" min="0" max="999" required></label>
+        <label>Code de contrôle<input id="sCtrl" class="ctrl" maxlength="4" required></label>
+        <button class="btn btn-jaune" type="submit">Ajouter</button>
+      </form>
+      <p class="erreur" id="erreurSaisie"></p>
+      <table class="tableau">
+        <thead><tr><th>Élève</th><th class="num">Bonnes / réponses</th><th class="num">Réussite brute</th><th class="num">Score retenu</th><th>Contrôle</th><th></th></tr></thead>
+        <tbody id="corpsSaisie"></tbody>
+      </table>
+      <p class="sous" id="compteSaisie"></p>
+      <div class="actions-g">
+        <button class="btn btn-jaune" id="bPodium" type="button">Afficher le podium</button>
+        <button class="btn btn-neutre" id="bRetourCode" type="button">Revoir le code de la partie</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Podium -->
+  <section class="vue-prof hidden" id="vueFin">
+    <div class="final">
+      <h2>Le podium</h2>
+      <div class="podium">
+        <div class="marche m2" id="p2"><div class="qui"></div><div class="det"></div><div class="socle">2</div></div>
+        <div class="marche m1" id="p1"><div class="qui"></div><div class="det"></div><div class="socle">1</div></div>
+        <div class="marche m3" id="p3"><div class="qui"></div><div class="det"></div><div class="socle">3</div></div>
+      </div>
+      <div class="actions">
+        <button class="btn btn-neutre" id="bVoirTout" type="button">Afficher tous les résultats</button>
+        <button class="btn btn-neutre" id="bExport" type="button">Télécharger les résultats (CSV)</button>
+        <button class="btn btn-neutre" id="bRetourSaisie" type="button">Retour à la saisie</button>
+        <button class="btn btn-jaune" id="bNouvelle2" type="button">Nouvelle partie</button>
+      </div>
+      <div class="resultats hidden" id="resultats">
+        <table class="tableau">
+          <thead><tr><th class="rang">#</th><th>Élève</th><th class="num">Bonnes / réponses</th><th class="num">Réussite brute</th><th class="num">Score retenu</th></tr></thead>
+          <tbody id="corpsFin"></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+  <div class="confetti" id="confetti"></div>
+</main>
+
+<!-- ================= ÉLÈVE ================= -->
+<main id="eleve" class="hidden">
+  <header class="eleve-barre">
+    <strong id="monNom"></strong>
+    <span class="score" id="monScore">0 / 0</span>
+    <button class="son-btn" id="bSon" aria-pressed="true" type="button">Son : oui</button>
+    <span class="temps" id="monTemps"></span>
+  </header>
+  <div class="eleve-jauge"><i id="maJauge" style="width:100%"></i></div>
+  <div class="eleve-zone">
+    <div class="attente hidden" id="ecranAttente">
+      <div class="gros" id="attenteTitre"></div>
+      <p class="sous" id="attenteSous"></p>
+    </div>
+    <div class="question hidden" id="ecranQuestion">
+      <div class="etiquette-theme" id="qTheme"></div>
+      <h2 id="qTexte"></h2>
+      <div class="choix" id="qChoix"></div>
+      <div class="correction hidden" id="qCorrection"><b id="qVerdict"></b><span id="qExplication"></span></div>
+      <button class="btn btn-jaune suivante hidden" id="bSuivante" type="button">Question suivante (Entrée)</button>
+    </div>
+    <div class="bilan hidden" id="ecranBilan">
+      <div class="sous">Partie terminée – ton score</div>
+      <div class="pct" id="bilanPct">0 %</div>
+      <div id="bilanDetail" style="max-width:600px"></div>
+      <div class="bloc-code">
+        <span class="sous">À donner à ton professeur</span>
+        <span id="bilanResume" style="font-size:1.3rem;font-weight:700"></span>
+        <span class="sous">Code de contrôle</span>
+        <b id="bilanCtrl"></b>
+      </div>
+      <p class="sous">Tes résultats par thème :</p>
+      <ul class="themes-bilan" id="bilanThemes"></ul>
+    </div>
+  </div>
+</main>
+
+<script>var THEMES = {
+  vente:  "Les étapes de la vente",
+  suivi:  "Le suivi des ventes",
+  recla:  "Demandes et réclamations",
+  cv:     "Le CV",
+  lettre: "La lettre de motivation",
+  retours:"Le traitement des retours"
+};
+/* Format : th = thème, q = question, r = réponses (la 1re est TOUJOURS la bonne, l'ordre est mélangé à l'affichage), e = explication */
+var QUESTIONS = [
+/* ---------- Étapes de la vente ---------- */
+{th:"vente", q:"Quelle est la première étape de l'entretien de vente ?", r:["La prise de contact","La découverte des besoins","L'argumentation","La conclusion"], e:"La vente commence par la prise de contact : saluer, sourire, se rendre disponible."},
+{th:"vente", q:"La règle des 4 × 20 concerne surtout…", r:["La prise de contact","La conclusion","Le traitement des objections","La prise de congé"], e:"20 premières secondes, 20 premiers mots, 20 premiers gestes, 20 cm du visage : tout se joue dès le premier contact."},
+{th:"vente", q:"Pour faire parler le client pendant la découverte des besoins, on utilise surtout…", r:["Des questions ouvertes","Des questions fermées","Des affirmations","Le silence complet"], e:"Une question ouverte (« Que recherchez-vous ? ») laisse le client s'exprimer librement."},
+{th:"vente", q:"« Est-ce pour un usage quotidien ? » est une question…", r:["Fermée","Ouverte","De reformulation","D'objection"], e:"On peut y répondre par oui ou par non : c'est une question fermée."},
+{th:"vente", q:"À quoi sert la reformulation ?", r:["Vérifier qu'on a bien compris le besoin du client","Annoncer le prix","Conclure la vente","Mettre fin à l'entretien"], e:"Reformuler (« Si je comprends bien, vous cherchez… ») montre au client qu'il a été écouté et évite les erreurs."},
+{th:"vente", q:"Dans la méthode SONCAS, que signifie le S (première lettre) ?", r:["Sécurité","Simplicité","Satisfaction","Service"], e:"SONCAS : Sécurité, Orgueil, Nouveauté, Confort, Argent, Sympathie. Ce sont les motivations d'achat du client."},
+{th:"vente", q:"Dans la méthode SONCAS, que signifie le A ?", r:["Argent","Achat","Avantage","Accueil"], e:"Le client motivé par l'argent cherche une bonne affaire, un prix, une économie."},
+{th:"vente", q:"Un client dit : « Je veux un produit que personne n'a encore. » Quel mobile SONCAS ?", r:["Nouveauté","Confort","Sécurité","Sympathie"], e:"L'attrait pour ce qui est nouveau, innovant ou à la mode correspond au mobile Nouveauté."},
+{th:"vente", q:"Un argument CAP se compose de…", r:["Caractéristique – Avantage – Preuve","Client – Achat – Prix","Conseil – Accueil – Produit","Contact – Argument – Prise de congé"], e:"On part d'une caractéristique du produit, on en tire un avantage pour le client et on le prouve."},
+{th:"vente", q:"« Ce téléphone a une batterie de 5 000 mAh. » C'est…", r:["Une caractéristique","Un avantage","Une preuve","Une objection"], e:"C'est une donnée technique du produit. L'avantage serait : « Vous tiendrez toute la journée sans recharger »."},
+{th:"vente", q:"« C'est trop cher ! » Pour le vendeur, c'est…", r:["Une objection","Une reformulation","Un argument","Un signal de prise de congé"], e:"Une objection est un frein exprimé par le client. Elle se traite, elle ne s'ignore pas."},
+{th:"vente", q:"Face à une objection, le vendeur doit d'abord…", r:["Écouter le client sans l'interrompre","Contredire le client","Baisser le prix tout de suite","Changer de sujet"], e:"On écoute, on reformule, puis on répond avec un argument adapté."},
+{th:"vente", q:"Proposer un étui de protection avec le téléphone acheté, c'est…", r:["Une vente additionnelle","Une objection","Une réclamation","Une prise de contact"], e:"Le vendeur propose un produit complémentaire : c'est une vente additionnelle."},
+{th:"vente", q:"Lequel de ces comportements est un signal d'achat ?", r:["Le client demande les délais de livraison","Le client regarde sa montre","Le client se dirige vers la sortie","Le client ne répond pas aux questions"], e:"Quand le client se projette (livraison, paiement, garantie), c'est le moment de conclure."},
+{th:"vente", q:"Quelle étape termine l'entretien de vente ?", r:["La prise de congé","La découverte des besoins","L'argumentation","Le traitement des objections"], e:"La prise de congé : remercier, rassurer sur l'achat et laisser une bonne dernière impression."},
+
+/* ---------- Suivi des ventes ---------- */
+{th:"suivi", q:"Quel document le client remplit-il pour passer commande ?", r:["Le bon de commande","La facture","Le bon de livraison","L'avoir"], e:"Le bon de commande précise ce que le client commande : produits, quantités, prix, conditions."},
+{th:"suivi", q:"Quel document confirme au client que sa commande a bien été reçue et acceptée ?", r:["L'accusé de réception de commande","La facture","Le devis","L'avoir"], e:"L'accusé de réception (ou confirmation) de commande rassure le client et engage le vendeur."},
+{th:"suivi", q:"Quel document accompagne la marchandise au moment de la livraison ?", r:["Le bon de livraison","La facture","Le devis","Le bon de commande"], e:"Le client vérifie la livraison grâce au bon de livraison avant de le signer."},
+{th:"suivi", q:"Quel document demande au client de payer ?", r:["La facture","Le devis","Le bon de livraison","Le bon de commande"], e:"La facture indique le montant à payer et les conditions de règlement."},
+{th:"suivi", q:"Quel document indique le prix d'une prestation AVANT que le client ne commande ?", r:["Le devis","La facture","L'avoir","Le bon de livraison"], e:"Le devis permet au client de connaître le prix avant de s'engager."},
+{th:"suivi", q:"Un client rapporte un article : le magasin ne le rembourse pas en argent mais lui remet…", r:["Un avoir","Une facture","Un devis","Un bon de commande"], e:"L'avoir est un document qui annule tout ou partie d'une facture ; le client peut l'utiliser pour un autre achat."},
+{th:"suivi", q:"Que signifie SAV ?", r:["Service après-vente","Suivi avant vente","Service d'aide à la vente","Système d'achat validé"], e:"Le service après-vente gère les réparations, retours et questions après l'achat."},
+{th:"suivi", q:"Suivre l'évolution d'une commande permet surtout de…", r:["Informer le client et anticiper les retards","Augmenter le prix de vente","Éviter de livrer le client","Supprimer la facture"], e:"Prévenir le client d'un retard avant qu'il ne réclame, c'est préserver sa confiance."},
+{th:"suivi", q:"Quel outil permet de mesurer la satisfaction des clients ?", r:["Un questionnaire de satisfaction","Un bon de livraison","Une facture","Un devis"], e:"Le questionnaire (papier, mail, QR code…) recueille l'avis des clients après l'achat."},
+{th:"suivi", q:"Sur 200 clients interrogés, 150 sont satisfaits. Quel est le taux de satisfaction ?", r:["75 %","50 %","25 %","150 %"], e:"150 ÷ 200 × 100 = 75 %."},
+{th:"suivi", q:"Comment calcule-t-on le panier moyen ?", r:["Chiffre d'affaires ÷ nombre de clients","Chiffre d'affaires × nombre de clients","Nombre de clients ÷ chiffre d'affaires","Chiffre d'affaires − nombre de clients"], e:"Le panier moyen = ce que dépense en moyenne un client lors d'un passage en caisse."},
+{th:"suivi", q:"Chiffre d'affaires de la journée : 3 000 €, pour 120 clients. Quel est le panier moyen ?", r:["25 €","36 €","250 €","2 880 €"], e:"3 000 ÷ 120 = 25 €."},
+{th:"suivi", q:"400 personnes sont entrées dans le magasin et 100 ont acheté. Quel est le taux de transformation ?", r:["25 %","40 %","4 %","100 %"], e:"Taux de transformation = acheteurs ÷ visiteurs × 100 = 100 ÷ 400 × 100 = 25 %."},
+{th:"suivi", q:"Pourquoi transmettre à son responsable les avis des clients ?", r:["Pour améliorer l'offre et le service","Pour sanctionner les clients","Pour ne plus les recontacter","Ce n'est jamais utile"], e:"Les remontées clients aident l'entreprise à corriger ce qui ne va pas et à fidéliser."},
+
+/* ---------- Demandes et réclamations ---------- */
+{th:"recla", q:"Qu'est-ce qu'une réclamation ?", r:["L'expression d'un mécontentement du client","Une demande de renseignement","Une commande","Un compliment"], e:"Le client signale un problème et attend une solution."},
+{th:"recla", q:"Un client demande les horaires d'ouverture du magasin. C'est…", r:["Une demande d'information","Une réclamation","Une objection","Une commande"], e:"Il n'exprime aucun mécontentement : c'est une simple demande."},
+{th:"recla", q:"Un client mécontent arrive à l'accueil. Que fait-on en premier ?", r:["On l'écoute sans l'interrompre","On lui explique qu'il a tort","On appelle la sécurité","On lui propose tout de suite un remboursement"], e:"Laisser le client s'exprimer fait souvent baisser la tension. On cherche la solution ensuite."},
+{th:"recla", q:"Le client hausse le ton. La bonne attitude :", r:["Rester calme et courtois","Hausser le ton aussi","Partir sans rien dire","Lui tourner le dos"], e:"Le calme du vendeur aide le client à se calmer à son tour."},
+{th:"recla", q:"Quelle phrase est à éviter face à une réclamation ?", r:["« Ce n'est pas de ma faute. »","« Je comprends votre mécontentement. »","« Je vais trouver une solution avec vous. »","« Pouvez-vous me montrer le produit ? »"], e:"Se défausser donne l'impression que l'entreprise ne prend pas le problème en charge."},
+{th:"recla", q:"Pourquoi reformuler la réclamation du client ?", r:["Pour montrer qu'on a compris et vérifier le problème","Pour gagner du temps","Pour le contredire","Pour clore la discussion"], e:"La reformulation rassure le client et évite de proposer une mauvaise solution."},
+{th:"recla", q:"Pour un produit neuf, combien de temps dure la garantie légale de conformité ?", r:["2 ans","6 mois","1 an","5 ans"], e:"Le consommateur dispose de 2 ans à compter de la délivrance du bien (Code de la consommation)."},
+{th:"recla", q:"Pour un achat sur internet, de combien de jours dispose le client pour se rétracter ?", r:["14 jours","7 jours","30 jours","Aucun délai"], e:"Le droit de rétractation est de 14 jours pour la vente à distance."},
+{th:"recla", q:"Un client veut rendre un article acheté en magasin parce qu'il a changé d'avis. La loi l'y oblige-t-elle ?", r:["Non, c'est un geste commercial si le magasin l'accepte","Oui, 14 jours","Oui, 30 jours","Oui, toujours"], e:"Le droit de rétractation légal ne s'applique pas aux achats en magasin ; l'enseigne peut l'accorder librement."},
+{th:"recla", q:"Pourquoi enregistrer chaque réclamation (fiche, logiciel) ?", r:["Pour suivre son traitement et éviter que le problème se reproduise","Pour punir le client","Pour ne jamais y répondre","Ce n'est pas utile"], e:"La traçabilité permet de suivre le dossier et d'analyser les problèmes récurrents."},
+{th:"recla", q:"Une réclamation bien traitée peut…", r:["Renforcer la fidélité du client","Faire perdre le client à coup sûr","Augmenter les prix","Être ignorée sans conséquence"], e:"Un client dont le problème a été bien réglé garde une bonne image de l'entreprise."},
+{th:"recla", q:"Une réponse écrite à une réclamation doit être…", r:["Personnalisée, polie et rapide","Copiée-collée pour tous les clients","Envoyée plusieurs semaines après","Rédigée en langage SMS"], e:"Le client attend qu'on réponde à SA situation, dans un délai raisonnable et avec courtoisie."},
+
+/* ---------- CV ---------- */
+{th:"cv", q:"Quel est l'objectif principal d'un CV ?", r:["Obtenir un entretien","Raconter toute sa vie","Remplacer la lettre de motivation","Indiquer le salaire souhaité"], e:"Le CV doit donner envie au recruteur de vous rencontrer."},
+{th:"cv", q:"Dans quel ordre présente-t-on généralement ses expériences ?", r:["Du plus récent au plus ancien","Du plus ancien au plus récent","Par ordre alphabétique","Au hasard"], e:"C'est l'ordre antéchronologique : le recruteur voit d'abord ce que vous avez fait en dernier."},
+{th:"cv", q:"Pour un lycéen, quelle longueur de CV est conseillée ?", r:["1 page","3 pages","5 pages","Une demi-ligne"], e:"Une page claire et lisible suffit lorsqu'on débute."},
+{th:"cv", q:"Quelle adresse mail choisir pour son CV ?", r:["prenom.nom@…","bogoss72@…","jesuisleplusbo@…","lafolledu93@…"], e:"Une adresse sobre avec prénom et nom donne une image sérieuse."},
+{th:"cv", q:"En France, la photo sur le CV est…", r:["Facultative","Obligatoire","Interdite","Obligatoire en couleur"], e:"Elle n'est pas obligatoire. Si on en met une, elle doit être professionnelle."},
+{th:"cv", q:"Dans quelle rubrique indique-t-on ses stages (PFMP) ?", r:["Expériences professionnelles","Centres d'intérêt","Formation","Coordonnées"], e:"Les PFMP sont de vraies expériences en entreprise : elles vont dans Expériences professionnelles."},
+{th:"cv", q:"Dans quelle rubrique indique-t-on « Bac Pro MCV en cours » ?", r:["Formation","Expériences professionnelles","Centres d'intérêt","Compétences"], e:"Les diplômes et formations, même en cours, vont dans la rubrique Formation."},
+{th:"cv", q:"« Accueillir la clientèle, encaisser, mettre en rayon » sont…", r:["Des compétences","Des centres d'intérêt","Des diplômes","Des coordonnées"], e:"Ce sont des savoir-faire acquis en formation ou en entreprise."},
+{th:"cv", q:"Le titre placé en haut du CV sert à…", r:["Indiquer le poste ou le stage recherché","Donner son âge","Écrire son adresse","Mettre une citation"], e:"Le recruteur comprend en un coup d'œil ce que vous cherchez."},
+{th:"cv", q:"Que faire avant d'envoyer son CV ?", r:["Relire et corriger l'orthographe","L'envoyer sans relire","Ajouter des émojis","Changer de police à chaque ligne"], e:"Une faute d'orthographe peut suffire à écarter une candidature."},
+{th:"cv", q:"Pour envoyer son CV par mail, quel format est le plus sûr ?", r:["PDF","Photo prise avec le téléphone","Capture d'écran","Fichier compressé .zip"], e:"Le PDF garde la mise en page identique sur tous les ordinateurs."},
+
+/* ---------- Lettre de motivation ---------- */
+{th:"lettre", q:"Quelle est la structure classique d'une lettre de motivation ?", r:["Vous – Moi – Nous","Moi – Moi – Moi","Nous – Vous – Moi","Bonjour – Merci – Au revoir"], e:"Vous (l'entreprise), Moi (le candidat), Nous (la future collaboration)."},
+{th:"lettre", q:"Dans la partie « Vous », on parle…", r:["De l'entreprise","De ses loisirs","De son salaire","De ses parents"], e:"On montre qu'on connaît l'entreprise et pourquoi elle nous intéresse."},
+{th:"lettre", q:"Dans la partie « Moi », on présente…", r:["Ses compétences et qualités utiles au poste","L'histoire de l'entreprise","Ses défauts","Ses vacances"], e:"On explique ce qu'on peut apporter à l'entreprise, avec des exemples concrets."},
+{th:"lettre", q:"Dans la partie « Nous », on…", r:["Propose une rencontre (entretien)","Recopie son CV","Parle uniquement du salaire","Raconte une blague"], e:"On se projette dans la collaboration et on demande un entretien."},
+{th:"lettre", q:"Où place-t-on ses propres coordonnées ?", r:["En haut à gauche","En haut à droite","En bas au centre","Nulle part"], e:"Coordonnées du candidat à gauche, celles du destinataire à droite."},
+{th:"lettre", q:"Que contient la ligne « Objet » ?", r:["Le poste ou le stage visé","La date de naissance","La formule de politesse","Le nom de son lycée uniquement"], e:"L'objet résume la demande : « Candidature pour un stage de vendeur(se) »."},
+{th:"lettre", q:"Une candidature spontanée, c'est…", r:["Une candidature envoyée sans répondre à une offre","Une réponse à une annonce","Un CV sans lettre","Une lettre envoyée à tout le monde sans la modifier"], e:"On écrit à une entreprise qui n'a pas publié d'offre."},
+{th:"lettre", q:"Peut-on envoyer exactement la même lettre à toutes les entreprises ?", r:["Non, il faut la personnaliser","Oui, c'est plus rapide","Oui, si on change la date","Oui, les recruteurs ne lisent pas"], e:"Une lettre personnalisée montre au recruteur un vrai intérêt pour SON entreprise."},
+{th:"lettre", q:"Quelle formule finale est adaptée ?", r:["« Je vous prie d'agréer, Madame, Monsieur, l'expression de mes salutations distinguées. »","« Bisous ! »","« À plus ! »","« Bonne journée les gars. »"], e:"La lettre de motivation utilise un registre formel."},
+{th:"lettre", q:"Quel est le lien entre la lettre et le CV ?", r:["La lettre complète le CV sans le recopier","La lettre recopie le CV","Le CV remplace la lettre","Ils n'ont aucun lien"], e:"La lettre explique la motivation et met en valeur les points forts du CV."},
+{th:"lettre", q:"Dans une lettre de motivation, on s'adresse au recruteur…", r:["En le vouvoyant","En le tutoyant","En langage SMS","Par son prénom"], e:"Le vouvoiement est de rigueur dans un écrit professionnel."},
+/* ========== Série 2 : étapes de la vente ========== */
+{th:"vente", q:"Un client entre dans le magasin. Quelle est la bonne attitude ?", r:["Le saluer avec le sourire dès les premières secondes","L'ignorer tant qu'il ne demande rien","Le suivre de près dans les rayons","Lui annoncer tout de suite les promotions"], e:"Un accueil souriant et rapide met le client en confiance dès la prise de contact."},
+{th:"vente", q:"Lequel de ces comportements montre une écoute active ?", r:["Regarder le client et reformuler ce qu'il dit","Préparer sa réponse pendant qu'il parle","Regarder son téléphone","Finir les phrases du client à sa place"], e:"L'écoute active, c'est montrer au client qu'on s'intéresse vraiment à ce qu'il dit."},
+{th:"vente", q:"À quelle étape le vendeur présente-t-il le produit en fonction des besoins du client ?", r:["L'argumentation","La prise de contact","La prise de congé","L'encaissement"], e:"Une fois les besoins découverts, le vendeur argumente en choisissant les avantages qui intéressent CE client."},
+{th:"vente", q:"Un bon argument doit être…", r:["Adapté aux besoins et aux motivations du client","Le même pour tous les clients","Le plus technique possible","Le plus long possible"], e:"Un argument convainc quand il répond à ce que le client recherche."},
+{th:"vente", q:"« Grâce à cette batterie, vous tiendrez toute la journée sans recharger. » C'est…", r:["Un avantage pour le client","Une caractéristique technique","Une objection","Une prise de congé"], e:"L'avantage traduit la caractéristique en bénéfice concret pour le client."},
+{th:"vente", q:"Faire une démonstration du produit devant le client correspond, dans la méthode CAP, à…", r:["La preuve","La caractéristique","L'avantage","La prise de contact"], e:"La démonstration, l'essai, un label ou un avis client prouvent ce que le vendeur affirme."},
+{th:"vente", q:"Dans la méthode SONCAS, que signifie le O ?", r:["Orgueil","Offre","Objection","Organisation"], e:"Le client motivé par l'orgueil veut se valoriser : marque prestigieuse, produit exclusif, image."},
+{th:"vente", q:"Dans la méthode SONCAS, que signifie le C ?", r:["Confort","Conseil","Client","Commande"], e:"Le client motivé par le confort cherche la facilité d'utilisation, le bien-être, le gain de temps."},
+{th:"vente", q:"« Ce produit est-il solide ? Est-il garanti ? » Quel mobile SONCAS ?", r:["Sécurité","Nouveauté","Orgueil","Sympathie"], e:"Le client a besoin d'être rassuré : c'est le mobile Sécurité."},
+{th:"vente", q:"« Je reviens toujours ici parce que l'équipe est très agréable. » Quel mobile SONCAS ?", r:["Sympathie","Argent","Confort","Nouveauté"], e:"La relation avec le vendeur ou l'enseigne compte pour ce client : c'est la Sympathie."},
+{th:"vente", q:"Face à l'objection « C'est trop cher », le vendeur peut…", r:["Mettre en avant la qualité et les avantages du produit par rapport à son prix","Dire au client qu'il n'a pas les moyens","Ignorer la remarque","Baisser le prix sans rien dire"], e:"On justifie le prix par ce que le produit apporte au client."},
+{th:"vente", q:"Quand le vendeur doit-il chercher à conclure la vente ?", r:["Quand il repère des signaux d'achat","Dès que le client entre","Avant la découverte des besoins","Jamais, c'est au client de décider seul"], e:"Les signaux d'achat (questions sur la livraison, le paiement, la garantie…) montrent que le client est prêt."},
+{th:"vente", q:"Proposer au client un modèle plus haut de gamme que celui qu'il envisageait, c'est…", r:["Une montée en gamme","Une prise de congé","Une reformulation","Une réclamation"], e:"Le vendeur propose un produit plus performant et plus cher, s'il correspond mieux au besoin."},
+{th:"vente", q:"Que fait le vendeur lors de la prise de congé ?", r:["Il remercie le client et le salue","Il tourne le dos dès que le client a payé","Il lui propose de revenir le contredire","Il lui demande de ne plus revenir"], e:"La dernière impression compte autant que la première : on remercie et on salue."},
+{th:"vente", q:"Commander sur internet puis retirer sa commande en magasin, c'est…", r:["Le click and collect","La livraison à domicile","Le démarchage","La vente additionnelle"], e:"C'est un exemple de parcours omnicanal : le client combine internet et magasin."},
+
+/* ========== Série 2 : suivi des ventes ========== */
+{th:"suivi", q:"Dans quel ordre logique apparaissent ces documents ?", r:["Devis – bon de commande – bon de livraison – facture","Facture – devis – bon de livraison – bon de commande","Bon de livraison – facture – devis – bon de commande","Bon de commande – facture – devis – bon de livraison"], e:"On chiffre (devis), le client commande, on livre, puis on facture."},
+{th:"suivi", q:"Quand le client doit-il vérifier sa marchandise ?", r:["Au moment de la livraison, avant de signer le bon de livraison","Un an après","Seulement s'il a payé en espèces","Jamais, c'est le rôle du livreur"], e:"Une fois le bon de livraison signé sans remarque, il est plus difficile de contester."},
+{th:"suivi", q:"Le colis livré est abîmé. Que doit faire le client ?", r:["Noter des réserves précises sur le bon de livraison","Signer sans rien dire","Jeter le colis","Refuser de donner son nom"], e:"Les réserves écrites (« carton écrasé, produit rayé… ») gardent une trace du problème."},
+{th:"suivi", q:"Que signifie HT ?", r:["Hors taxes","Haute tension","Hors tarif","Hors transport"], e:"Le prix HT est le prix sans la TVA."},
+{th:"suivi", q:"Que signifie TTC ?", r:["Toutes taxes comprises","Tarif total client","Transport tout compris","Total toutes commandes"], e:"Le prix TTC est le prix payé par le consommateur, TVA incluse."},
+{th:"suivi", q:"Quel est le taux normal de TVA en France ?", r:["20 %","5,5 %","10 %","33 %"], e:"Le taux normal est de 20 % ; des taux réduits existent pour certains produits."},
+{th:"suivi", q:"Un produit coûte 100 € HT. Avec une TVA à 20 %, quel est son prix TTC ?", r:["120 €","100 €","80 €","200 €"], e:"100 × 1,20 = 120 € TTC."},
+{th:"suivi", q:"Chiffre d'affaires : 4 500 € pour 150 clients. Quel est le panier moyen ?", r:["30 €","45 €","150 €","300 €"], e:"4 500 ÷ 150 = 30 €."},
+{th:"suivi", q:"250 visiteurs, 50 acheteurs. Quel est le taux de transformation ?", r:["20 %","50 %","25 %","5 %"], e:"50 ÷ 250 × 100 = 20 %."},
+{th:"suivi", q:"Sur 60 clients interrogés, 48 sont satisfaits. Quel est le taux de satisfaction ?", r:["80 %","48 %","60 %","12 %"], e:"48 ÷ 60 × 100 = 80 %."},
+{th:"suivi", q:"Lequel de ces moyens permet aussi de connaître la satisfaction des clients ?", r:["Les avis clients laissés sur internet","Le bon de livraison","Le planning du personnel","Le ticket de caisse"], e:"Les avis en ligne sont une source d'information sur la satisfaction, à lire et à analyser."},
+{th:"suivi", q:"Appeler un client quelques jours après son achat pour savoir s'il est satisfait, c'est…", r:["Un appel de suivi","Un appel de prospection","Un inventaire","Une objection"], e:"Le suivi après-vente montre au client que l'entreprise se soucie de lui."},
+{th:"suivi", q:"Une commande client sera livrée en retard. Que faire ?", r:["Prévenir le client et lui donner un nouveau délai","Attendre qu'il appelle","Annuler la commande sans le prévenir","Lui dire que ce n'est pas votre problème"], e:"Informer avant que le client ne s'inquiète évite souvent une réclamation."},
+{th:"suivi", q:"La livraison et l'installation à domicile d'un lave-linge sont…", r:["Des services associés à la vente","Des objections","Des réclamations","Des produits de remplacement"], e:"Le vendeur doit suivre la bonne exécution de ces services et en rendre compte."},
+
+/* ========== Série 2 : demandes et réclamations ========== */
+{th:"recla", q:"« Mon colis n'est jamais arrivé, c'est inadmissible ! » C'est…", r:["Une réclamation","Une demande d'information","Un compliment","Une commande"], e:"Le client exprime un mécontentement et attend une solution."},
+{th:"recla", q:"Quelle est la bonne méthode pour traiter une réclamation ?", r:["Écouter – reformuler – vérifier – proposer une solution – conclure – enregistrer et suivre","Proposer une solution – écouter – vérifier – conclure – reformuler – enregistrer","Vérifier – conclure – écouter – reformuler – enregistrer – proposer","Enregistrer – proposer – écouter – vérifier – reformuler – conclure"], e:"Les 6 étapes : accueillir et écouter, reformuler, vérifier, proposer une solution, conclure, enregistrer et suivre."},
+{th:"recla", q:"Une réclamation arrive par mail. Que faire en premier ?", r:["Accuser réception et indiquer qu'elle est prise en charge","L'ignorer","Attendre une relance du client","La supprimer"], e:"Le client sait ainsi que sa demande a bien été reçue et qu'elle va être traitée."},
+{th:"recla", q:"La réclamation est justifiée : c'est une erreur du magasin. Il faut…", r:["S'excuser au nom de l'entreprise et proposer une solution","Accuser un collègue","Nier l'erreur","Demander au client de revenir plus tard sans solution"], e:"Reconnaître l'erreur et la corriger rétablit la confiance."},
+{th:"recla", q:"Le vendeur ne peut pas régler le problème lui-même. Il doit…", r:["Transmettre au service ou au responsable compétent et en informer le client","Dire au client qu'il n'y a pas de solution","Laisser le dossier de côté","Renvoyer le client vers un concurrent"], e:"Le vendeur reste l'interlocuteur du client : il transmet et l'informe du suivi."},
+{th:"recla", q:"Le client a cassé le produit en le faisant tomber. Sa demande de remplacement gratuit est…", r:["Injustifiée : on l'explique calmement et on peut proposer une alternative","Justifiée : on rembourse toujours","Justifiée au titre de la garantie légale","Une simple demande d'information"], e:"La garantie couvre les défauts du produit, pas la casse due au client. On reste courtois et on propose par exemple une réparation payante."},
+{th:"recla", q:"Un geste commercial, c'est…", r:["Un avantage accordé volontairement par l'entreprise pour satisfaire le client","Une obligation fixée par la loi","Une sanction contre le client","Une garantie légale"], e:"Bon d'achat, remise, échange hors délai… l'entreprise n'y est pas obligée."},
+{th:"recla", q:"Quelle différence entre la garantie légale et la garantie commerciale ?", r:["La garantie commerciale est facultative, la garantie légale est obligatoire","Elles sont toutes les deux facultatives","La garantie légale est payante","La garantie commerciale remplace la garantie légale"], e:"La garantie commerciale s'ajoute à la garantie légale, elle ne la remplace jamais."},
+{th:"recla", q:"Avec la garantie légale de conformité, que peut d'abord demander le client ?", r:["La réparation ou le remplacement du bien","Un produit gratuit en plus","Un bon d'achat obligatoire","Rien, c'est au vendeur de décider"], e:"Le consommateur peut obtenir la mise en conformité du bien : réparation ou remplacement."},
+{th:"recla", q:"Dans quel délai le vendeur doit-il réparer ou remplacer le bien non conforme ?", r:["1 mois (30 jours)","7 jours","6 mois","2 ans"], e:"Si la réparation ou le remplacement n'est pas fait sous 1 mois, le client peut obtenir une réduction de prix ou l'annulation de la vente."},
+{th:"recla", q:"Pour un achat en ligne, à partir de quand courent les 14 jours de rétractation ?", r:["À partir de la réception du bien","À partir de la commande, toujours","À partir de la fabrication du produit","À partir du premier problème"], e:"Pour un bien acheté à distance, le délai court à partir de sa réception."},
+{th:"recla", q:"La garantie légale des vices cachés peut être utilisée pendant…", r:["2 ans à partir de la découverte du défaut","14 jours après l'achat","3 mois après l'achat","Jamais pour un particulier"], e:"Le délai de 2 ans démarre à la découverte du vice caché."},
+
+/* ========== Série 2 : CV ========== */
+{th:"cv", q:"Que place-t-on tout en haut du CV ?", r:["Ses nom, prénom et coordonnées","Ses centres d'intérêt","La formule de politesse","Le nom de son professeur"], e:"Le recruteur doit pouvoir vous contacter facilement."},
+{th:"cv", q:"Laquelle de ces informations ne doit PAS figurer sur un CV ?", r:["Le numéro de sécurité sociale","Le numéro de téléphone","L'adresse mail","La formation suivie"], e:"C'est une donnée personnelle sensible qui n'a rien à faire sur un CV."},
+{th:"cv", q:"À quoi servent les centres d'intérêt sur un CV ?", r:["À montrer sa personnalité et ses qualités","À remplir la page","À indiquer son salaire","Ils sont obligatoires et ne servent à rien"], e:"Un loisir peut montrer l'esprit d'équipe, la persévérance, la créativité…"},
+{th:"cv", q:"Quel centre d'intérêt est le mieux présenté ?", r:["Football en club depuis 5 ans","Football","Dormir","Rien de spécial"], e:"Être précis montre un engagement et des qualités (régularité, esprit d'équipe)."},
+{th:"cv", q:"Pour décrire ses missions en entreprise, on utilise…", r:["Des verbes d'action : accueillir, conseiller, encaisser","Des phrases très longues","Des abréviations SMS","Des émojis"], e:"Les verbes d'action rendent les compétences claires et concrètes."},
+{th:"cv", q:"Pour chaque PFMP, que faut-il indiquer ?", r:["Les dates, l'entreprise, le lieu et les missions réalisées","Seulement le nom de l'entreprise","Le nom de son tuteur et son âge","Rien, les stages ne comptent pas"], e:"Ces précisions permettent au recruteur de comprendre ce que vous savez faire."},
+{th:"cv", q:"Comment indiquer une langue étrangère sur son CV ?", r:["Avec son niveau, par exemple : Anglais – niveau B1","Juste « Anglais »","« Je parle un peu »","On ne l'indique jamais"], e:"Le niveau (A1 à C2) permet au recruteur de savoir ce que vous êtes capable de faire."},
+{th:"cv", q:"Ponctualité, sens du contact, travail en équipe sont…", r:["Des savoir-être (qualités)","Des diplômes","Des coordonnées","Des expériences professionnelles"], e:"Ce sont des qualités personnelles très recherchées dans les métiers du commerce."},
+{th:"cv", q:"Faut-il adapter son CV à chaque offre ?", r:["Oui, en mettant en avant ce qui correspond au poste","Non, jamais","Seulement la photo","Seulement l'adresse mail"], e:"Un CV ciblé montre au recruteur que votre profil correspond à ses attentes."},
+{th:"cv", q:"Peut-on inventer une expérience sur son CV ?", r:["Non, le recruteur peut vérifier et la confiance serait perdue","Oui, tout le monde le fait","Oui, si l'expérience est courte","Oui, si on n'a pas de stage"], e:"Un CV doit être honnête. Mieux vaut valoriser ce qu'on a réellement fait."},
+{th:"cv", q:"Quel nom donner au fichier de son CV ?", r:["CV_Prenom_Nom.pdf","document1.pdf","truc.pdf","sans titre.docx"], e:"Le recruteur identifie immédiatement votre candidature."},
+
+/* ========== Série 2 : lettre de motivation ========== */
+{th:"lettre", q:"Où place-t-on les coordonnées de l'entreprise destinataire ?", r:["En haut à droite","En haut à gauche","En bas à gauche","Au milieu de la lettre"], e:"Candidat à gauche, destinataire à droite."},
+{th:"lettre", q:"Quelle formule d'appel choisir quand on ne connaît pas le nom du recruteur ?", r:["« Madame, Monsieur, »","« Salut, »","« Coucou, »","« Cher ami, »"], e:"C'est la formule neutre et polie utilisée dans les courriers professionnels."},
+{th:"lettre", q:"Quelle longueur est conseillée pour une lettre de motivation ?", r:["Une page maximum","Trois pages","Cinq lignes","Il n'y a aucune limite"], e:"Le recruteur doit pouvoir la lire rapidement : courte, claire, efficace."},
+{th:"lettre", q:"Que faut-il faire avant d'écrire la partie « Vous » ?", r:["Se renseigner sur l'entreprise (site, magasin, produits)","Copier une lettre trouvée sur internet","Écrire son CV une deuxième fois","Rien de particulier"], e:"On ne peut pas parler de l'entreprise sans la connaître."},
+{th:"lettre", q:"Quelle phrase convient le mieux à la partie « Moi » ?", r:["« Lors de ma PFMP, j'ai accueilli et conseillé la clientèle. »","« Votre magasin est très connu. »","« Je vous propose de nous rencontrer. »","« J'aime dormir le week-end. »"], e:"La partie « Moi » présente ses compétences avec des exemples concrets."},
+{th:"lettre", q:"Le ton d'une lettre de motivation doit être…", r:["Positif et motivé","Négatif et plaintif","Familier","Agressif"], e:"On met en avant ses atouts, sans se dévaloriser."},
+{th:"lettre", q:"Quelle phrase est à éviter dans une lettre de motivation ?", r:["« Je cherche un stage parce que c'est obligatoire. »","« Votre enseigne m'attire par la qualité de son accueil. »","« Je suis motivé(e) pour rejoindre votre équipe. »","« Je serais ravi(e) de vous rencontrer. »"], e:"Cette phrase montre un manque de motivation : le recruteur veut sentir un vrai intérêt."},
+{th:"lettre", q:"Où se place la signature ?", r:["En bas, après la formule de politesse","En haut, avant les coordonnées","Dans l'objet","Elle n'est pas nécessaire"], e:"La lettre se termine par la formule de politesse, puis le prénom, le nom et la signature."},
+{th:"lettre", q:"« Vous trouverez ci-joint mon CV. » Cette phrase sert à…", r:["Indiquer que le CV accompagne la lettre","Remplacer le CV","Demander un salaire","Se présenter à l'oral"], e:"Elle signale au recruteur la pièce jointe."},
+{th:"lettre", q:"On envoie sa candidature par mail. Que met-on dans le corps du mail ?", r:["Un court message poli, avec le CV et la lettre en pièces jointes","Rien du tout, juste les pièces jointes","Toute sa lettre en majuscules","Un message en langage SMS"], e:"Le mail est le premier contact : il doit être bref, poli et présenter la candidature."},
+{th:"lettre", q:"Que doit montrer une lettre de motivation ?", r:["Pourquoi on veut ce poste dans cette entreprise et ce qu'on peut lui apporter","Uniquement ses notes au lycée","La liste de tous ses loisirs","Ses problèmes personnels"], e:"La lettre convainc le recruteur que vous êtes la bonne personne pour ce poste."},
+/* ========== Le traitement des retours (d'après le cours « Traiter les retours et les réclamations » – 1MCVA) ========== */
+{th:"retours", q:"Le client rapporte un produit pour l'échanger ou être remboursé, souvent sans défaut. C'est…", r:["Un retour","Une réclamation","Une objection","Une médiation"], e:"Un retour concerne un produit rapporté ou renvoyé, souvent sans défaut. La réclamation exprime un mécontentement."},
+{th:"retours", q:"Un retour peut-il aussi être une réclamation ?", r:["Oui, quand le produit est défectueux","Non, jamais","Oui, mais seulement sur internet","Non, sauf si le client crie"], e:"Un produit défectueux rapporté est à la fois un retour et une réclamation."},
+{th:"retours", q:"Une cliente rapporte un maillot acheté hier en magasin : elle n'aime plus la couleur. Le magasin est-il obligé de le reprendre ?", r:["Non, cela dépend de la politique du magasin","Oui, la loi l'impose sous 14 jours","Oui, grâce à la garantie légale de conformité","Oui, grâce à la garantie des vices cachés"], e:"Achat en magasin sans défaut : aucune obligation légale. Échange, avoir ou remboursement relèvent de la politique commerciale."},
+{th:"retours", q:"Pour un retour en magasin sans défaut, de quoi dépend l'acceptation ?", r:["Des règles du magasin : délai, ticket, état du produit","Du Code civil","De l'humeur du vendeur","Du médiateur de la consommation"], e:"C'est la politique commerciale du magasin qui fixe les conditions."},
+{th:"retours", q:"Après une rétractation, dans quel délai le vendeur doit-il rembourser le client ?", r:["14 jours","48 heures","1 mois","2 ans"], e:"Le vendeur rembourse dans les 14 jours suivant l'information de la rétractation."},
+{th:"retours", q:"Le client n'a pas été informé de son droit de rétractation. Le délai peut alors aller jusqu'à…", r:["12 mois","14 jours","30 jours","5 ans"], e:"L'absence d'information prolonge le délai de rétractation, jusqu'à 12 mois."},
+{th:"retours", q:"Chaussures achetées il y a 3 mois chez un vendeur professionnel : la semelle se décolle. Quelle garantie s'applique ?", r:["La garantie légale de conformité","Le droit de rétractation","Aucune, c'est trop tard","Le geste commercial obligatoire"], e:"Le défaut apparaît dans les 2 ans suivant la délivrance : la garantie légale de conformité s'applique."},
+{th:"retours", q:"Pendant la garantie légale de conformité, qui doit prouver que le défaut n'existait pas à l'achat ?", r:["Le vendeur","Le client","Le médiateur","Le transporteur"], e:"Pendant ce délai, la preuve est à la charge du vendeur, pas du client."},
+{th:"retours", q:"La réparation ou le remplacement est impossible, ou n'est pas fait sous 1 mois. Le client peut obtenir…", r:["Une réduction de prix ou l'annulation de la vente","Uniquement un avoir","Rien de plus","Un deuxième produit gratuit"], e:"Le client choisit d'abord réparation ou remplacement ; sinon, réduction de prix ou annulation de la vente."},
+{th:"retours", q:"La garantie des vices cachés s'applique…", r:["À tout vendeur, y compris un particulier","Uniquement aux grandes surfaces","Uniquement aux achats sur internet","Uniquement aux produits neufs vendus en magasin"], e:"Contrairement à la garantie légale de conformité, elle concerne aussi un vendeur particulier (Code civil, art. 1641 et suivants)."},
+{th:"retours", q:"Avec la garantie des vices cachés, qui doit prouver le défaut ?", r:["Le client","Le vendeur","Le fabricant","Personne"], e:"Pour les vices cachés, la preuve est à la charge du client."},
+{th:"retours", q:"Le désaccord avec le client persiste. Vers qui peut-il se tourner ?", r:["Un médiateur de la consommation","Le directeur du lycée","Un autre client","Personne"], e:"Tout professionnel doit permettre l'accès gratuit à un médiateur de la consommation."},
+{th:"retours", q:"Avant de saisir le médiateur, que doit faire le client ?", r:["Adresser une réclamation écrite au professionnel","Laisser un avis négatif en ligne","Rien, il peut le saisir directement","Payer des frais de dossier"], e:"Le client fait d'abord une réclamation écrite, puis peut saisir le médiateur dans l'année."},
+{th:"retours", q:"La médiation de la consommation est…", r:["Gratuite pour le consommateur","Payante pour le consommateur","Réservée aux entreprises","Obligatoirement faite au tribunal"], e:"Elle est gratuite pour le consommateur ; le médiateur propose une solution sous 90 jours."},
+{th:"retours", q:"Une erreur de prix sur le ticket de caisse est une réclamation de type…", r:["Prix / facturation","Livraison","Accueil / service","Information"], e:"Types de réclamations : produit, livraison, prix/facturation, accueil/service, information."},
+{th:"retours", q:"Quelle est la première étape pour traiter un retour ou une réclamation ?", r:["Accueillir et écouter sans interrompre","Proposer un remboursement","Vérifier le ticket de caisse","Remplir la fiche réclamation"], e:"On laisse d'abord le client s'exprimer, même s'il est énervé."},
+{th:"retours", q:"À l'étape « Vérifier », que contrôle le vendeur ?", r:["La preuve d'achat, la date, l'état du produit, le lieu et les conditions de retour","Uniquement la couleur du produit","L'âge du client","Le salaire du client"], e:"Ces vérifications permettent de savoir quelle règle s'applique."},
+{th:"retours", q:"La décision dépasse le rôle du vendeur. Que fait-il ?", r:["Il appelle son responsable","Il refuse la demande","Il rembourse quand même","Il demande au client de revenir un autre jour"], e:"Le vendeur reste dans son rôle et fait intervenir la bonne personne."},
+{th:"retours", q:"Un produit défectueux est confié au SAV pour réparation. Quel document remet-on au client ?", r:["Un bon de dépôt","Une facture","Un devis","Un bon de commande"], e:"Le bon de dépôt SAV prouve que le produit a été confié au magasin."},
+{th:"retours", q:"Quelle solution convient à un vêtement de mauvaise taille ?", r:["L'échange","La médiation","La garantie des vices cachés","La réparation"], e:"L'échange convient pour une mauvaise taille, une couleur, ou pour remplacer un produit défectueux."},
+{th:"retours", q:"Quelle phrase professionnelle remplace « Calmez-vous ! » ?", r:["« Je comprends votre mécontentement. »","« Arrêtez de crier. »","« Ce n'est pas mon problème. »","« Revenez quand vous serez calme. »"], e:"On reconnaît l'émotion du client au lieu de lui donner un ordre."},
+{th:"retours", q:"Quelle phrase professionnelle remplace « C'est pas moi, c'est le transporteur » ?", r:["« Je m'occupe de voir avec notre transporteur. »","« Appelez vous-même le transporteur. »","« Le transporteur est toujours en retard. »","« Je n'y peux rien. »"], e:"On ne cherche pas de coupable : on prend le problème en charge."},
+{th:"retours", q:"En septembre : 3 000 tickets de caisse et 60 réclamations. Quel est le taux de réclamation ?", r:["2 %","20 %","5 %","0,5 %"], e:"Taux de réclamation = réclamations ÷ tickets × 100 = 60 ÷ 3 000 × 100 = 2 %."},
+{th:"retours", q:"40 réclamations, dont 30 traitées en moins de 48 h. Quel est le taux de traitement rapide ?", r:["75 %","30 %","40 %","25 %"], e:"Taux de traitement rapide = traitées en moins de 48 h ÷ total × 100 = 30 ÷ 40 × 100 = 75 %."}
+];
+</script>
+<script>
+(function(){
+"use strict";
+var EMPREINTE_PROF = "a2471e27c59acebb6de7b5bb6e2c1bcfe2e13958a5e87f7307d07d4703559d6d";      // empreinte SHA-256 du code enseignant (le code lui-même n'est pas dans le fichier)
+var ORDRE_THEMES = ["vente","suivi","recla","cv","lettre","retours"];   // ne pas changer l'ordre : il sert à fabriquer les codes de partie
+var ALPHA = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";                       // 32 signes, sans I, O, 0, 1
+
+function $(id){ return document.getElementById(id); }
+function lire(k,d){ try{ var v=localStorage.getItem(k); return v===null?d:JSON.parse(v);}catch(e){return d;} }
+function ecrire(k,v){ try{ localStorage.setItem(k,JSON.stringify(v)); }catch(e){} }
+function lireS(k){ try{ return sessionStorage.getItem(k);}catch(e){return null;} }
+function ecrireS(k,v){ try{ if(v===null) sessionStorage.removeItem(k); else sessionStorage.setItem(k,v);}catch(e){} }
+function nettoyer(s){ return String(s||"").replace(/[\u0000-\u001f<>]/g,"").trim().slice(0,16); }
+function normPrenom(s){ var t=String(s||"").normalize("NFD").replace(/[̀-ͯ]/g,"").toUpperCase().replace(/[^A-Z]/g,""); return t||"X"; }
+function melanger(a){ a=a.slice(); for(var i=a.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)); var t=a[i];a[i]=a[j];a[j]=t; } return a; }
+function pct(ok,rep){ return rep ? Math.round(ok/rep*100) : 0; }
+function score(ok,rep,seuil){ var d=Math.max(rep,seuil||1); return Math.round(ok/d*100); }
+function mmss(ms){ var s=Math.max(0,Math.ceil(ms/1000)); return Math.floor(s/60)+":"+String(s%60).padStart(2,"0"); }
+function couleurPct(p){ return p>=70 ? "var(--vert)" : p>=50 ? "var(--jaune)" : "var(--rouge)"; }
+
+/* ---------- SHA-256 (sans dépendance, fonctionne hors connexion) ---------- */
+function sha256(texte){
+  var ascii=unescape(encodeURIComponent(texte)), i, j;
+  function rr(v,n){ return (v>>>n)|(v<<(32-n)); }
+  var maxWord=Math.pow(2,32), resultat="", mots=[], longueur=ascii.length*8;
+  var h=[], k=[], nb=0, compose={};
+  for(var c=2; nb<64; c++){ if(!compose[c]){ for(i=0;i<313;i+=c) compose[i]=c; h[nb]=(Math.pow(c,.5)*maxWord)|0; k[nb++]=(Math.pow(c,1/3)*maxWord)|0; } }
+  ascii+="\x80"; while(ascii.length%64-56) ascii+="\x00";
+  for(i=0;i<ascii.length;i++){ j=ascii.charCodeAt(i); mots[i>>2]|=j<<((3-i)%4)*8; }
+  mots[mots.length]=((longueur/maxWord)|0); mots[mots.length]=longueur;
+  var hash=h.slice(0,8);
+  for(j=0;j<mots.length;){
+    var w=mots.slice(j,j+=16), ancien=hash; hash=hash.slice(0,8);
+    for(i=0;i<64;i++){
+      var w15=w[i-15], w2=w[i-2], a=hash[0], e=hash[4];
+      var t1=hash[7]+(rr(e,6)^rr(e,11)^rr(e,25))+((e&hash[5])^((~e)&hash[6]))+k[i]
+        +(w[i]=(i<16)?w[i]:(w[i-16]+(rr(w15,7)^rr(w15,18)^(w15>>>3))+w[i-7]+(rr(w2,17)^rr(w2,19)^(w2>>>10)))|0);
+      var t2=(rr(a,2)^rr(a,13)^rr(a,22))+((a&hash[1])^(a&hash[2])^(hash[1]&hash[2]));
+      hash=[(t1+t2)|0].concat(hash); hash[4]=(hash[4]+t1)|0;
+    }
+    for(i=0;i<8;i++) hash[i]=(hash[i]+ancien[i])|0;
+  }
+  for(i=0;i<8;i++) for(j=3;j+1;j--){ var b=(hash[i]>>(j*8))&255; resultat+=((b<16)?0:"")+b.toString(16); }
+  return resultat;
+}
+function bitsDe(texte,n){ return parseInt(sha256(texte).slice(0,8),16) % Math.pow(2,n); }
+
+/* ---------- Code de partie : il transporte les réglages ---------- */
+function versCode(n,nbSignes){ var s=""; for(var i=0;i<nbSignes;i++){ s=ALPHA[n%32]+s; n=Math.floor(n/32); } return s; }
+function depuisCode(s){ var n=0; for(var i=0;i<s.length;i++){ var v=ALPHA.indexOf(s[i]); if(v<0) return -1; n=n*32+v; } return n; }
+function fabriquerCode(r){
+  var masque=0; ORDRE_THEMES.forEach(function(k,i){ if(r.themes.indexOf(k)!==-1) masque|=(1<<i); });
+  var sel=Math.floor(Math.random()*256);
+  var n=((((r.minutes*64+masque)*512+(r.seuil-1))*2+(r.son?1:0))*256+sel);
+  var total=n*512+bitsDe("partie|"+n,9);
+  var c=versCode(total,8); return c.slice(0,4)+"-"+c.slice(4);
+}
+function lireCode(saisie){
+  var s=String(saisie||"").toUpperCase().replace(/[^A-Z0-9]/g,"");
+  if(s.length!==8) return null;
+  var total=depuisCode(s); if(total<0) return null;
+  var verif=total%512, n=Math.floor(total/512);
+  if(bitsDe("partie|"+n,9)!==verif) return null;
+  var x=Math.floor(n/256); var son=x%2; x=Math.floor(x/2);
+  var seuil=x%512+1; x=Math.floor(x/512); var masque=x%64; var minutes=Math.floor(x/64);
+  if(minutes<1||minutes>120||!masque) return null;
+  var themes=ORDRE_THEMES.filter(function(k,i){ return masque&(1<<i); });
+  return {code:s.slice(0,4)+"-"+s.slice(4), minutes:minutes, themes:themes, seuil:seuil, son:!!son};
+}
+function codeControle(codePartie,prenom,ok,rep){
+  return versCode(bitsDe("ctrl|"+codePartie+"|"+normPrenom(prenom)+"|"+ok+"|"+rep,20),4);
+}
+
+/* ---------- Sons (synthétisés, aucun fichier) ---------- */
+var Son = {
+  ctx:null, actif:true,
+  debloquer:function(){ try{ this.ctx = this.ctx || new (window.AudioContext||window.webkitAudioContext)(); if(this.ctx.state==="suspended") this.ctx.resume(); }catch(e){} },
+  note:function(f,debut,duree,type,vol){
+    if(!this.actif||!this.ctx) return;
+    try{
+      var c=this.ctx,t=c.currentTime+(debut||0),o=c.createOscillator(),g=c.createGain();
+      o.type=type||"sine"; o.frequency.setValueAtTime(f,t);
+      g.gain.setValueAtTime(0.0001,t); g.gain.exponentialRampToValueAtTime(vol||0.2,t+0.02); g.gain.exponentialRampToValueAtTime(0.0001,t+duree);
+      o.connect(g); g.connect(c.destination); o.start(t); o.stop(t+duree+0.05);
+    }catch(e){}
+  },
+  juste:function(){ this.note(660,0,.15,"triangle"); this.note(990,.12,.3,"triangle"); },
+  faux:function(){ this.note(200,0,.35,"sawtooth",.12); this.note(150,.15,.35,"sawtooth",.12); },
+  tic:function(){ this.note(1200,0,.06,"square",.08); },
+  depart:function(){ var n=[523,659,784,1047]; for(var i=0;i<4;i++) this.note(n[i],i*.12,.25,"triangle"); },
+  fin:function(){ this.note(784,0,.3,"square",.12); this.note(523,.3,.6,"square",.12); },
+  marche:function(i){ this.note([392,494,587][i],0,.4,"triangle",.25); },
+  fanfare:function(){ var n=[523,659,784,1047,784,1047]; var d=[0,.15,.3,.45,.75,.9]; for(var i=0;i<n.length;i++) this.note(n[i],d[i],i===5?.8:.2,"triangle",.25); }
+};
+document.addEventListener("pointerdown",function(){ Son.debloquer(); },{once:true});
+
+/* ---------- Accueil ---------- */
+$("prenom").value = lire("rev-nom","");
+$("codeSaisi").addEventListener("input",function(){
+  var s=this.value.toUpperCase().replace(/[^A-Z0-9]/g,"").slice(0,8);
+  this.value = s.length>4 ? s.slice(0,4)+"-"+s.slice(4) : s;
+});
+$("bEspaceProf").onclick=function(){ $("formProf").classList.toggle("hidden"); if(!$("formProf").classList.contains("hidden")) $("codeProf").focus(); };
+$("formProf").addEventListener("submit",function(e){
+  e.preventDefault();
+  if(sha256("1MRC|"+$("codeProf").value.trim())===EMPREINTE_PROF){ ecrireS("rev-prof","1"); $("codeProf").value=""; Son.debloquer(); prof(); }
+  else { $("erreurProf").textContent="Code incorrect."; $("codeProf").select(); }
+});
+$("formEleve").addEventListener("submit",function(e){
+  e.preventDefault();
+  var r=lireCode($("codeSaisi").value), nom=nettoyer($("prenom").value);
+  if(!r){ $("erreurEleve").textContent="Code de partie incorrect. Vérifie-le au tableau."; return; }
+  if(!nom){ $("erreurEleve").textContent="Indique ton prénom."; return; }
+  Son.debloquer(); ecrire("rev-nom",nom);
+  ecrireS("rev-eleve",JSON.stringify({code:r.code,nom:nom}));
+  eleve(r,nom);
+});
+if(lireS("rev-prof")==="1") prof();
+else { var enCours=null; try{ enCours=JSON.parse(lireS("rev-eleve")||"null"); }catch(e){}
+  if(enCours){ var rr=lireCode(enCours.code); if(rr) eleve(rr,enCours.nom); } }
+
+/* ================================================================
+   ENSEIGNANT (hors connexion : rien ne sort de cet ordinateur)
+   ================================================================ */
+function prof(){
+  $("accueil").classList.add("hidden"); $("eleve").classList.add("hidden"); $("prof").classList.remove("hidden");
+  var etat=lire("rev-off-prof",null);   // {code, reglages, saisies:[], chronoFin}
+  var minuteur=null, dernierTic=-1;
+
+  // réglages
+  var reglage=lire("rev-off-reglages",{duree:"10",perso:8,themes:ORDRE_THEMES.slice(),son:true,seuil:null});
+  var boite=$("themes"); boite.innerHTML="";
+  ORDRE_THEMES.forEach(function(k){
+    var n=QUESTIONS.filter(function(q){return q.th===k;}).length;
+    var l=document.createElement("label");
+    l.innerHTML='<input type="checkbox" value="'+k+'"><span></span><em>'+n+' questions</em>';
+    l.querySelector("span").textContent=THEMES[k];
+    l.querySelector("input").checked=reglage.themes.indexOf(k)!==-1;
+    boite.appendChild(l);
+  });
+  var rd=document.querySelector('input[name=duree][value="'+reglage.duree+'"]'); if(rd) rd.checked=true;
+  $("dureePerso").value=reglage.perso; $("sonProf").checked=reglage.son;
+  $("dureePerso").addEventListener("focus",function(){ document.querySelector('input[name=duree][value=perso]').checked=true; });
+  var seuilManuel=!!reglage.seuil;
+  function minutesChoisies(){ var d=document.querySelector('input[name=duree]:checked').value; return d==="perso" ? Math.min(120,Math.max(1,parseInt($("dureePerso").value,10)||8)) : parseInt(d,10); }
+  function lireSeuil(){ return Math.min(300,Math.max(1,parseInt($("seuil").value,10)||1)); }
+  function majSeuil(){
+    if(!seuilManuel) $("seuil").value=minutesChoisies();
+    var s=lireSeuil(), ex=[[2,2],[Math.max(1,s-2),s],[25,30]];
+    $("seuilAide").textContent="En dessous de ce nombre, les questions manquantes comptent comme non réussies. Avec "+s+" : "+
+      ex.map(function(e){ return e[0]+" bonnes sur "+e[1]+" réponses → "+score(e[0],e[1],s)+" %"; }).join(" ; ")+". "+(seuilManuel?"":"(Réglé automatiquement : 1 réponse par minute de jeu.)");
+  }
+  $("seuil").value=reglage.seuil||minutesChoisies();
+  $("seuil").addEventListener("input",function(){ seuilManuel=true; majSeuil(); });
+  [].forEach.call(document.querySelectorAll('input[name=duree]'),function(r){ r.addEventListener("change",majSeuil); });
+  $("dureePerso").addEventListener("input",majSeuil);
+  majSeuil();
+
+  $("bCreer").onclick=function(){
+    var d=document.querySelector('input[name=duree]:checked').value;
+    var themes=[].map.call(document.querySelectorAll("#themes input:checked"),function(i){return i.value;});
+    if(!themes.length){ $("erreurCreer").textContent="Cochez au moins un thème."; return; }
+    $("erreurCreer").textContent="";
+    ecrire("rev-off-reglages",{duree:d,perso:parseInt($("dureePerso").value,10)||8,themes:themes,son:$("sonProf").checked,seuil:seuilManuel?lireSeuil():null});
+    var r={minutes:minutesChoisies(),themes:themes,seuil:lireSeuil(),son:$("sonProf").checked};
+    etat={code:fabriquerCode(r),reglages:r,saisies:[],chronoFin:0};
+    sauver(); afficherCode();
+  };
+  function sauver(){ ecrire("rev-off-prof",etat); }
+
+  function afficherCode(){
+    var r=etat.reglages;
+    $("codeAff").textContent=etat.code; $("codeGeant").textContent=etat.code; $("codeRappel").textContent=etat.code;
+    $("resume").textContent=r.minutes+" min · "+r.themes.map(function(k){return THEMES[k];}).join(", ")+" · minimum "+r.seuil+" réponse"+(r.seuil>1?"s":"")+" · son "+(r.son?"activé":"coupé");
+    montrer("vueCode");
+  }
+  $("bNouvelle").onclick=$("bNouvelle2").onclick=function(){
+    if(etat && etat.saisies.length && !confirm("Commencer une nouvelle partie ? Les résultats saisis pour la partie "+etat.code+" seront effacés (pensez à télécharger le CSV).")) return;
+    clearInterval(minuteur); etat=null; ecrire("rev-off-prof",null); $("codeAff").textContent="—"; montrer("vueReglages");
+  };
+  $("bQuitter").onclick=function(){ clearInterval(minuteur); ecrireS("rev-prof",null); location.reload(); };
+
+  // chrono au tableau
+  $("bChrono").onclick=function(){ Son.debloquer(); Son.actif=etat.reglages.son; etat.chronoFin=Date.now()+etat.reglages.minutes*60000; sauver(); Son.depart(); lancerChrono(); };
+  function lancerChrono(){ montrer("vueChrono"); dernierTic=-1; clearInterval(minuteur); minuteur=setInterval(tourChrono,250); tourChrono(); }
+  function tourChrono(){
+    var reste=etat.chronoFin-Date.now(), duree=etat.reglages.minutes*60000;
+    $("chronoGeant").textContent=mmss(reste); $("chronoGeant").classList.toggle("urgent",reste<=10000);
+    $("jaugeGeante").style.width=Math.max(0,Math.min(100,reste/duree*100))+"%";
+    var s=Math.ceil(reste/1000); if(s<=10&&s>0&&s!==dernierTic){ dernierTic=s; Son.tic(); }
+    if(reste<=0){ clearInterval(minuteur); Son.fin(); $("chronoGeant").textContent="0:00"; }
+  }
+  $("bArretChrono").onclick=function(){ clearInterval(minuteur); etat.chronoFin=0; sauver(); afficherCode(); };
+  $("bChronoSaisie").onclick=$("bVersSaisie").onclick=function(){ clearInterval(minuteur); montrer("vueSaisie"); renduSaisie(); $("sPrenom").focus(); };
+  $("bRetourCode").onclick=function(){ if(etat.chronoFin>Date.now()) lancerChrono(); else afficherCode(); };
+
+  // saisie
+  $("sCtrl").addEventListener("input",function(){ this.value=this.value.toUpperCase().replace(/[^A-Z0-9]/g,"").slice(0,4); });
+  $("formSaisie").addEventListener("submit",function(e){
+    e.preventDefault();
+    var nom=nettoyer($("sPrenom").value), ok=parseInt($("sOk").value,10), rep=parseInt($("sRep").value,10), ctrl=$("sCtrl").value.trim().toUpperCase();
+    if(!nom||isNaN(ok)||isNaN(rep)){ $("erreurSaisie").textContent="Complétez toutes les cases."; return; }
+    if(ok>rep){ $("erreurSaisie").textContent="Le nombre de bonnes réponses ne peut pas dépasser le nombre de réponses."; return; }
+    $("erreurSaisie").textContent="";
+    etat.saisies.push({nom:nom,ok:ok,rep:rep,ctrl:ctrl}); sauver(); renduSaisie();
+    $("formSaisie").reset(); $("sPrenom").focus();
+  });
+  function valide(s){ return s.ctrl===codeControle(etat.code,s.nom,s.ok,s.rep); }
+  function sc(s){ return score(s.ok,s.rep,etat.reglages.seuil); }
+  function cellule(tr,txt,cls){ var td=document.createElement("td"); td.textContent=txt; if(cls) td.className=cls; tr.appendChild(td); return td; }
+  function renduSaisie(){
+    var tb=$("corpsSaisie"); tb.innerHTML=""; var nbOk=0;
+    etat.saisies.forEach(function(s,i){
+      var tr=document.createElement("tr"), v=valide(s); if(v) nbOk++;
+      cellule(tr,s.nom); cellule(tr,s.ok+" / "+s.rep,"num"); cellule(tr,s.rep?pct(s.ok,s.rep)+" %":"–","num");
+      var c=cellule(tr,s.rep?sc(s)+" %":"–","num"); c.style.fontWeight="800";
+      var k=cellule(tr,v?"✔ "+s.ctrl:"✖ "+s.ctrl+" incorrect"); k.className=v?"ok-txt":"ko-txt";
+      var td=document.createElement("td"), b=document.createElement("button"); b.className="btn-x"; b.type="button"; b.textContent="Supprimer";
+      b.onclick=function(){ etat.saisies.splice(i,1); sauver(); renduSaisie(); }; td.appendChild(b); tr.appendChild(td);
+      tb.appendChild(tr);
+    });
+    var n=etat.saisies.length;
+    $("compteSaisie").textContent=n ? n+" résultat"+(n>1?"s":"")+" saisi"+(n>1?"s":"")+", dont "+nbOk+" avec un code correct. Seuls les codes corrects comptent pour le podium." : "Aucun résultat saisi pour l'instant.";
+    $("bPodium").disabled=nbOk===0;
+  }
+
+  // podium
+  var classement=[];
+  function trier(){
+    return etat.saisies.filter(function(s){ return valide(s)&&s.rep>0; }).sort(function(A,B){
+      return sc(B)-sc(A) || B.ok-A.ok || pct(B.ok,B.rep)-pct(A.ok,A.rep) || A.nom.localeCompare(B.nom);
+    });
+  }
+  $("bPodium").onclick=function(){
+    Son.debloquer(); Son.actif=etat.reglages.son;
+    classement=trier(); montrer("vueFin"); $("resultats").classList.add("hidden"); tableauFin();
+    ["p1","p2","p3"].forEach(function(id){ $(id).classList.remove("vu"); $(id).style.visibility="hidden"; });
+    [[2,"p3"],[1,"p2"],[0,"p1"]].forEach(function(o,i){
+      setTimeout(function(){
+        var s=classement[o[0]], el=$(o[1]); if(!s) return;
+        el.querySelector(".qui").textContent=s.nom;
+        el.querySelector(".det").textContent="Score "+sc(s)+" % · "+s.ok+" bonne"+(s.ok>1?"s":"")+" sur "+s.rep;
+        el.style.visibility="visible"; el.classList.add("vu");
+        if(o[0]===0){ Son.fanfare(); confettis(); } else Son.marche(i);
+      },900+i*1600);
+    });
+  };
+  function confettis(){
+    if(window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    var c=$("confetti"), cols=["#FFC61A","#E4322B","#1FA35C","#FFFFFF","#C9D2F2"];
+    for(var i=0;i<120;i++){ var e=document.createElement("i"); e.style.left=Math.random()*100+"vw"; e.style.background=cols[i%cols.length];
+      e.style.animationDuration=(2.5+Math.random()*2.5)+"s"; e.style.animationDelay=Math.random()*1.2+"s"; c.appendChild(e); }
+    setTimeout(function(){ c.innerHTML=""; },7000);
+  }
+  function tableauFin(){
+    var tb=$("corpsFin"); tb.innerHTML="";
+    classement.forEach(function(s,i){ var tr=document.createElement("tr");
+      cellule(tr,i+1,"rang"); cellule(tr,s.nom); cellule(tr,s.ok+" / "+s.rep,"num"); cellule(tr,pct(s.ok,s.rep)+" %","num");
+      var c=cellule(tr,sc(s)+" %","num"); c.style.fontWeight="800"; c.style.color="var(--jaune)"; tb.appendChild(tr); });
+  }
+  $("bVoirTout").onclick=function(){ $("resultats").classList.toggle("hidden"); };
+  $("bRetourSaisie").onclick=function(){ montrer("vueSaisie"); renduSaisie(); };
+  $("bExport").onclick=function(){
+    var l=[["Rang","Élève","Réponses","Bonnes réponses","Réussite brute (%)","Minimum attendu","Score retenu (%)","Code de contrôle"]];
+    var tous=classement.concat(etat.saisies.filter(function(s){ return classement.indexOf(s)===-1; }));
+    tous.forEach(function(s){ var rg=classement.indexOf(s);
+      l.push([rg===-1?"":rg+1,s.nom,s.rep,s.ok,s.rep?pct(s.ok,s.rep):"",etat.reglages.seuil,s.rep?sc(s):"",valide(s)?"correct":"incorrect"]); });
+    var csv="﻿"+l.map(function(r){return r.map(function(v){v=String(v); return /[;"\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v;}).join(";");}).join("\r\n");
+    var a=document.createElement("a"); a.href=URL.createObjectURL(new Blob([csv],{type:"text/csv;charset=utf-8"}));
+    a.download="resultats-1MRC-"+new Date().toISOString().slice(0,10)+"-"+etat.code+".csv"; document.body.appendChild(a); a.click(); a.remove();
+  };
+
+  function montrer(id){ ["vueReglages","vueCode","vueChrono","vueSaisie","vueFin"].forEach(function(v){ $(v).classList.toggle("hidden",v!==id); }); }
+
+  // reprise après rechargement
+  if(etat && etat.code){ if(etat.chronoFin>Date.now()) { $("codeAff").textContent=etat.code; $("codeRappel").textContent=etat.code; Son.actif=etat.reglages.son; lancerChrono(); } else afficherCode(); }
+  else montrer("vueReglages");
+}
+
+/* ================================================================
+   ÉLÈVE (hors connexion : le jeu tourne entièrement sur ce PC)
+   ================================================================ */
+function eleve(r,nom){
+  $("accueil").classList.add("hidden"); $("eleve").classList.remove("hidden");
+  $("monNom").textContent=nom;
+  var cle="rev-off-jeu-"+r.code+"-"+normPrenom(nom);
+  var qids=[]; QUESTIONS.forEach(function(q,i){ if(r.themes.indexOf(q.th)!==-1) qids.push(i); });
+  var duree=r.minutes*60000;
+  // une seule partie par code et par prénom sur ce PC : recharger la page reprend la partie en cours
+  var p=lire(cle,null);
+  if(!p){ p={debut:Date.now(),ok:0,rep:0,th:{},pile:melanger(qids),numero:0,fini:false}; ecrire(cle,p); Son.actif=r.son; Son.depart(); }
+  var finA=p.debut+duree, actuelle=null, repondu=false, minuteur=null, dernierTic=-1;
+  var sonPerso=lire("rev-son-eleve",true);
+  function majSon(){ Son.actif=sonPerso&&r.son; $("bSon").textContent="Son : "+(sonPerso?"oui":"non"); $("bSon").setAttribute("aria-pressed",String(sonPerso)); $("bSon").disabled=!r.son; if(!r.son) $("bSon").textContent="Son coupé"; }
+  majSon();
+  $("bSon").onclick=function(){ sonPerso=!sonPerso; ecrire("rev-son-eleve",sonPerso); Son.debloquer(); majSon(); };
+  function montrer(id){ ["ecranAttente","ecranQuestion","ecranBilan"].forEach(function(v){ $(v).classList.toggle("hidden",v!==id); }); }
+  function majScore(){ $("monScore").textContent=p.ok+" / "+p.rep; }
+  majScore();
+
+  function tour(){
+    var reste=finA-Date.now();
+    $("monTemps").textContent=mmss(reste); $("monTemps").classList.toggle("urgent",reste<=10000);
+    $("maJauge").style.width=Math.max(0,Math.min(100,reste/duree*100))+"%";
+    var s=Math.ceil(reste/1000); if(s<=10&&s>0&&s!==dernierTic){ dernierTic=s; Son.tic(); }
+    if(reste<=0) terminer();
+  }
+  function terminer(){
+    clearInterval(minuteur);
+    if(!p.fini){ p.fini=true; ecrire(cle,p); Son.fin(); }
+    $("monTemps").textContent="0:00"; $("maJauge").style.width="0%";
+    bilan();
+  }
+  function bilan(){
+    montrer("ecranBilan");
+    var sco=score(p.ok,p.rep,r.seuil);
+    $("bilanPct").textContent=sco+" %";
+    var txt=p.ok+" bonne"+(p.ok>1?"s":"")+" réponse"+(p.ok>1?"s":"")+" sur "+p.rep+" (réussite brute : "+pct(p.ok,p.rep)+" %).";
+    if(p.rep<r.seuil){ var m=r.seuil-p.rep; txt+=" Tu as répondu à "+p.rep+" question"+(p.rep>1?"s":"")+" sur les "+r.seuil+" attendues : "+(m>1?"les "+m+" manquantes comptent":"la question manquante compte")+" comme non réussie"+(m>1?"s":"")+"."; }
+    $("bilanDetail").textContent=txt;
+    $("bilanResume").textContent=nom+" : "+p.ok+" bonne"+(p.ok>1?"s":"")+" / "+p.rep+" réponse"+(p.rep>1?"s":"");
+    $("bilanCtrl").textContent=codeControle(r.code,nom,p.ok,p.rep);
+    var ul=$("bilanThemes"); ul.innerHTML="";
+    r.themes.forEach(function(k){ var t=p.th[k]; var li=document.createElement("li");
+      li.textContent=THEMES[k]+" : "+(t&&t.rep?pct(t.ok,t.rep)+" % ("+t.ok+"/"+t.rep+")":"–"); ul.appendChild(li); });
+  }
+  function suivante(){
+    if(p.fini||Date.now()>=finA) return;
+    if(p.numero>0 && p.numero%p.pile.length===0){ p.pile=melanger(p.pile); }
+    var qid=p.pile[p.numero%p.pile.length], q=QUESTIONS[qid];
+    actuelle={qid:qid}; repondu=false;
+    montrer("ecranQuestion");
+    $("qTheme").textContent=THEMES[q.th]; $("qTexte").textContent=q.q;
+    $("qCorrection").classList.add("hidden"); $("bSuivante").classList.add("hidden");
+    var zone=$("qChoix"); zone.innerHTML="";
+    melanger([0,1,2,3].slice(0,q.r.length)).forEach(function(idx,pos){
+      var b=document.createElement("button"); b.type="button"; b.dataset.idx=idx;
+      var k=document.createElement("kbd"); k.textContent=pos+1; b.appendChild(k);
+      b.appendChild(document.createTextNode(q.r[idx]));
+      b.onclick=function(){ repondre(idx); }; zone.appendChild(b);
+    });
+    zone.querySelector("button").focus();
+  }
+  function repondre(idx){
+    if(repondu||!actuelle||p.fini||Date.now()>finA) return;
+    repondu=true;
+    var q=QUESTIONS[actuelle.qid], ok=idx===0;
+    p.rep++; if(ok) p.ok++; p.numero++;
+    var t=p.th[q.th]=p.th[q.th]||{rep:0,ok:0}; t.rep++; if(ok) t.ok++;
+    ecrire(cle,p); majScore();
+    [].forEach.call($("qChoix").querySelectorAll("button"),function(b){
+      b.disabled=true; var i=+b.dataset.idx;
+      if(i===0) b.classList.add("juste"); else if(i===idx) b.classList.add("faux"); else b.classList.add("terne");
+    });
+    var c=$("qCorrection"); c.className="correction "+(ok?"ok":"ko");
+    $("qVerdict").textContent= ok ? "Bonne réponse !" : "Pas tout à fait. La bonne réponse : « "+q.r[0]+" »";
+    $("qExplication").textContent=q.e;
+    $("bSuivante").classList.remove("hidden"); $("bSuivante").focus();
+    if(ok) Son.juste(); else Son.faux();
+  }
+  $("bSuivante").onclick=suivante;
+  document.addEventListener("keydown",function(e){
+    if($("ecranQuestion").classList.contains("hidden")) return;
+    if(!repondu && /^[1-4]$/.test(e.key)){ var b=$("qChoix").querySelectorAll("button")[+e.key-1]; if(b){ e.preventDefault(); repondre(+b.dataset.idx);} }
+    else if(repondu && e.key==="Enter"){ e.preventDefault(); suivante(); }
+  });
+
+  if(p.fini || Date.now()>=finA) terminer();
+  else { minuteur=setInterval(tour,250); tour(); suivante(); }
+}
+})();
+</script>
+</body>
+</html>
